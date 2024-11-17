@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Detection from Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f8ff;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            color: #003366;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            color: #1d2cff;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .sidebar a.active, .sidebar a:hover {
+            background-color: #cce6ff;
+            color: #1d2cff;
+        }
+
+        .sidebar .bottom-buttons {
+            margin-top: auto;
+        }
+
+        .sidebar .settings, .sidebar .logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            text-decoration: none;
+            color: #1d2cff;
+            margin-bottom: 10px;
+        }
+
+        .sidebar .settings:hover, .sidebar .logout:hover {
+            color: #0033cc;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #1d2cff;
+            margin-bottom: 20px;
+        }
+
+        .upload-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .upload-container h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .upload-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .upload-container input[type="file"] {
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .upload-container button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1d2cff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upload-container button:hover {
+            background-color: #0033cc;
+        }
+
+        .results-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .results-container h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .results-container p {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <h2>Health Connect</h2>
+            <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('problem_solving') }}"><i class="fas fa-lightbulb"></i> Problem Solving</a>
+            <a href="{{ url_for('Track_Reports') }}" class="active"><i class="fas fa-chart-line"></i> Track Report</a>
+            <a href="{{ url_for('Locate_Nearby_Hospitals_and_Medical_Shops') }}"><i class="fas fa-map-marker-alt"></i> Nearby Hospitals & Medical Shops</a>
+            <a href="{{ url_for('About_Us') }}"><i class="fas fa-info-circle"></i> About Us</a>
+        </div>
+        <div class="bottom-buttons">
+            <a href="#" class="settings"><i class="fas fa-cog"></i> Settings</a>
+            <a href="{{ url_for('login') }}" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Upload Your Medical Report in PDF Format</h1>
+        <div class="upload-container">
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                <input type="file" name="report" accept=".pdf" required>
+                <button type="submit">
+                    <i class="fas fa-upload"></i> Upload & Analyze
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-container" id="results" style="display: none;">
+        <h2>Analysis Results</h2>
+        <p><strong>Disease Identified:</strong> <span id="disease"></span></p>
+        <p><strong>Precautions:</strong> <span id="precautions"></span></p>
+    </div>
+
+    <script>
+        // Example JavaScript to simulate backend response for the demo.
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Simulate file processing and disease analysis
+            setTimeout(() => {
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('disease').textContent = 'Diabetes Mellitus';
+                document.getElementById('precautions').textContent = 
+                    '1. Follow a healthy diet\n' +
+                    '2. Exercise regularly\n' +
+                    '3. Monitor blood sugar levels\n' +
+                    '4. Take prescribed medications\n' +
+                    '5. Stay hydrated and manage stress.';
+            }, 2000); // Simulate delay for processing
+        });
+    </script>
+</body>
+</html>
