@@ -1,5 +1,4 @@
-
-![Logo](https://health-connect-dusky.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FLogoHC.649ab8cd.jpg&w=640&q=75)
+![Logo](D:\Users\rhythm_jain\Downloads\Logo.png)
 
 
 # Health Connect App
