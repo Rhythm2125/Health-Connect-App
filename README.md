@@ -1,4 +1,4 @@
-![Logo](https://i.ibb.co/Gn8R3V8/Logo.png)
+<a href="https://ibb.co/f2837KQ"><img src="https://i.ibb.co/Qf8WGqX/Logo.png" alt="Health Connect Logo" width="200"></a>
 
 
 # Health Connect App
