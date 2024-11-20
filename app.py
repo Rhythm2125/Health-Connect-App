@@ -97,7 +97,7 @@ def tell_us_about_yourself():
         conn = sqlite3.connect('users.db')
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE users SET username = ?, age = ?, gender = ?, which_sport_do_you_do = ? WHERE name = ?",
+            "UPDATE users SET username = ?, age = ?, gender = ?, which_sport_do_you_do = ? WHERE email = ?",
             (username, age, gender, which_sport_do_you_do, email))
         conn.commit()
         conn.close()
