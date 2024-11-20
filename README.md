@@ -16,3 +16,14 @@ Health Connect is a user-friendly AI Based health management app designed to sim
 - [Somil Jain](https://github.com/Rhythm2125)
 - [Ubaid Ansari](https://github.com/Codngwthubaid)
 
+
+## Installation
+
+- Just Download the zip file
+- run app.py file
+- and, then you will get a link like this:-
+
+```bash
+  http://127.0.0.1:5000
+```
+- copy and paste it in your browser.
