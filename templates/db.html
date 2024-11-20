@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Connect Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            background-color: #f0f8ff;
+        }
+
+        /* Left Sidebar */
+        .left-sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            height: 100%;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Sidebar Content */
+        .left-sidebar h2 {
+            color: #003366;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .left-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            color: #1d2cff;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .left-sidebar a.active, .left-sidebar a:hover {
+            background-color: #cce6ff;
+            color: #1d2cff;
+        }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px; /* Space for left sidebar */
+            margin-right: 250px; /* Space for right sidebar */
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f0f8ff;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background-color: #1d2cff;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        /* Pie Chart Box */
+        .chart-box {
+            width: 3cm;
+            height: 3cm;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            border-left: 1px solid #ddd;
+            position: fixed;
+            height: 100%;
+            right: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Profile Section */
+        .right-sidebar .profile-section {
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #1d2cff;
+            margin-bottom: 10px;
+        }
+
+        .profile-info h4 {
+            font-size: 18px;
+            color: #003366;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            font-size: 14px;
+            margin: 2px 0;
+            color: #666;
+        }
+
+        .edit-profile-btn {
+            display: block;
+            background-color: #1d2cff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .edit-profile-btn:hover {
+            background-color: #1d2cff;
+        }
+
+        /* Notification Icon */
+        .notification-icon {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            font-size: 24px;
+            color: #1d2cff; 
+            cursor: pointer;
+        }
+
+        /* Chatbot button */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1d2cff;
+            color: white;
+            border-radius: 50%;
+            padding: 15px;
+            font-size: 24px;
+            box-shadow: 0px 4px 10px rgb(25, 44, 255);
+            cursor: pointer;
+            z-index: 2000;
+        }
+
+        .chatbot-btn:hover {
+            background-color: #1d2cff;
+        }
+
+        #chatbot-container {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 400px;
+            height: 600px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgb(25, 44, 255);
+            z-index: 3000;
+            overflow: hidden;
+        }
+
+        #chatbot-header {
+            background-color: #1d2cff;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chatbot-messages {
+            padding: 10px;
+            overflow-y: auto;
+            height: calc(100% - 100px);
+        }
+
+        #chatbot-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+
+        #chatbot-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        #send-chatbot {
+            margin-left: 10px;
+            padding: 8px;
+            background-color: #1d2cff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .left-sidebar, .right-sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="left-sidebar">
+        <div>
+            <h2>Health Connect</h2>
+            <a href="{{ url_for('dashboard') }}" class="active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{{ url_for('problem_solving') }}">
+                <i class="fas fa-lightbulb"></i> Problem Solving
+            </a>
+            <a href="{{ url_for('Track_Reports') }}">
+                <i class="fas fa-chart-line"></i> Track Report
+            </a>
+            <a href="{{ url_for('Locate_Nearby_Hospitals_and_Medical_Shops') }}">
+                <i class="fas fa-map-marker-alt"></i> Nearby Hospitals & Medical Shops
+            </a>
+            <a href="{{ url_for('About_Us') }}">
+                <i class="fas fa-info-circle"></i> About Us
+            </a>
+        </div>
+        <div class="sidebar-bottom">
+            <a href="#">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Hello, {{ name }},</h2>
+            <h2>Today is {{ day }}</h2>
+        </div>
+
+        <!-- Pie Chart Box -->
+        <div class="pie-chart-container">
+            <canvas id="myPieChart" width="200" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Chatbot Button -->
+    <div class="chatbot-btn">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div id="chatbot-container">
+        <div id="chatbot-header">
+            <strong>Med AI</strong>
+            <button id="close-chatbot" style="background: none; border: none; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div id="chatbot-messages">
+            <div>Hi! How can I assist you?</div>
+        </div>
+        <div id="chatbot-input-container">
+            <input 
+                type="text" 
+                id="chatbot-input" 
+                placeholder="Type a command..." 
+            />
+            <button id="send-chatbot">Send</button>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+        <div class="profile-section">
+            <!-- Notification Icon -->
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+
+            <img src="https://via.placeholder.com/80" alt="Profile Picture" class="profile-pic">
+            <div class="profile-info">
+                <h4>{{ username }}</h4>
+                <p>{{ gender }}, {{ age }} years old</p>
+            </div>
+            <a href="#" class="edit-profile-btn">Edit Profile</a>
+        </div>
+    </div>
+
+    <script>
+        // Pie Chart Initialization
+        const ctx = document.getElementById('myPieChart').getContext('2d');
+        const myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Completed', 'In Progress', 'Pending'],
+                datasets: [{
+                    data: [10, 15, 10], // Example data
+                    backgroundColor: ['#1d2cff', '#ffcc00', '#ff5733'],
+                    borderColor: ['#fff', '#fff', '#fff'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: false, // Disable responsiveness to keep the specified size
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false, // Optional: Hide the legend for better fit
+                    },
+                },
+            }
+        });
+
+        // Chatbot Functionality
+        const chatbotMessages = document.getElementById('chatbot-messages');
+        const chatbotInput = document.getElementById('chatbot-input');
+        const sendChatbotButton = document.getElementById('send-chatbot');
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const chatbotToggleButton = document.querySelector('.chatbot-btn');
+        const closeChatbotButton = document.getElementById('close-chatbot');
+
+        // OpenAI API Key and Endpoint
+        const API_KEY = "AIzaSyA5LRTfn3mX6dBC0Xgg262JomqmCOC6Z6U";
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
+
+        // Send Message to Chatbot
+        function sendMessage(message, fromBot = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.style.marginBottom = '10px';
+            msgDiv.style.textAlign = fromBot ? 'left' : 'right';
+            msgDiv.textContent = message;
+            chatbotMessages.appendChild(msgDiv);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // Handle Chatbot Response
+        async function fetchChatbotResponse(userMessage) {
+            try {
+                const requestBody = {
+                    prompt: {
+                        text: userMessage
+                    },
+                    temperature: 0.7,
+                    candidateCount: 1,
+                };
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${API_KEY}`,
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const botMessage = data?.candidates[0]?.output || "I couldn't process that.";
+                    sendMessage(botMessage, true);
+                } else {
+                    console.error("API Error:", data);
+                    sendMessage("Error: " + (data.error?.message || "API call failed."), true);
+                }
+            } catch (error) {
+                console.error("Network Error:", error);
+                sendMessage("Error: Unable to connect to the chatbot. Please try again later.", true);
+            }
+        }
+
+        // Process User Commands
+        function processCommand(userMessage) {
+            fetchChatbotResponse(userMessage);
+        }
+
+        // Event Listener for "Send" Button
+        sendChatbotButton.addEventListener('click', () => {
+            const userMessage = chatbotInput.value.trim();
+            if (userMessage) {
+                sendMessage(userMessage); // Display user message
+                chatbotInput.value = ''; // Clear input
+                processCommand(userMessage); // Fetch chatbot response
+            }
+        });
+
+        // Allow Sending via "Enter" Key
+        chatbotInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendChatbotButton.click();
+            }
+        });
+
+        // Toggle Chatbot Visibility
+        chatbotToggleButton.addEventListener('click', () => {
+            chatbotContainer.style.display = chatbotContainer.style.display === 'none' || !chatbotContainer.style.display ? 'block' : 'none';
+        });
+
+        // Close Chatbot
+        closeChatbotButton.addEventListener('click', () => {
+            chatbotContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
