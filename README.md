@@ -6,6 +6,8 @@ Your health is in your hand!🩺
 
 Health Connect is a user-friendly AI Based health management app designed to simplify tracking, managing, and improving your overall well-being.
 
+🌐 **Checkout Our Website**: [Health Connect](https://kzminmetaqm4l0qc70ok.lite.vusercontent.net/)
+
 ## Meet Our Team
 - [Rishabh Jain](https://github.com/Rishh2005)
 - [Rhythm Jain](https://github.com/Rhythm2125)
